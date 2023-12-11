@@ -4,7 +4,7 @@ class Word
 
   def initialize
     @words = generate_words_array
-    @word = @words[rand(0..@words.length)]
+    @word = @words.sample
   end
 
   def generate_words_array
@@ -21,5 +21,4 @@ class Word
 end
 
 word = Word.new
-
-puts word.word
+p word.word
