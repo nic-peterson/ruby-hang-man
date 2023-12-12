@@ -2,10 +2,10 @@
 
 # TODO
 
-- [ ] Create a Word class => get words from external source. Called by the game class to populate the game.
+- [x] Create a Word class => get words from external source. Called by the game class to populate the game.
 - [ ] Create Game class => handle logic for the game
 - [ ] Serialization class => State management. Called by the game class as part of the flow of the game.
-- [ ] Display class => User display. Called by the game class to let the user know how the game is going and laying out options.
+      ~~- [ ] Display class => User display. Called by the game class to let the user know how the game is going and laying out options.~~
 
 # Order
 
