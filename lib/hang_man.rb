@@ -51,6 +51,51 @@ module Display
   end
 end
 
+module GameLogic
+  NUMBER_OF_ATTEMPTS = 6
+  # Initializes the game state
+  def setup_game()
+    @word = Word.new.word.downcase
+    @current_state = "_" * @word.length
+    @guessed_letters = []
+    @remaining_attempts = NUMBER_OF_ATTEMPTS
+  end
+
+  # Checks if the given letter is in the word
+  def check_guess(letter)
+    if @word.include?(letter)
+      update_current_state(letter)
+      :correct
+    else
+      @remaining_attempts -= 1
+      :incorrect
+    end
+  end
+
+  # Updates the current state of the word
+  def update_current_state(letter)
+    @word.each_char.with_index do |char, index|
+      @current_state[index] = letter if char == letter
+    end
+    @guessed_letters.push(letter) unless @guessed_letters.include?(letter)
+  end
+
+  # Checks if the game has been won
+  def won?
+    @current_state == @word
+  end
+
+  # Checks if the game has been lost
+  def lost?
+    @remaining_attempts <= 0
+  end
+
+  # Checks if the game is over
+  def game_over?
+    won? || lost?
+  end
+end
+
 class InputHandler
   # Prompts the user for a guess and returns the validated guess
   def get_user_guess(guessed_letters)
@@ -73,63 +118,42 @@ class InputHandler
 end
 
 class Game
-  NUMBER_OF_ATTEMPTS = 6
+  include GameLogic
   include Display
 
   def initialize
-    @word = Word.new.word
-    @current_state = "_" * @word.length
-    @remaining_attempts = NUMBER_OF_ATTEMPTS
-    @guess_array = []
+    setup_game() # Method from GameLogic module
     @input_handler = InputHandler.new
   end
 
   def play
-    until (@remaining_attempts == 0)
+    until game_over? # Method from GameLogic
+      show_current_state(@current_state, @remaining_attempts, @guessed_letters) # Method from Display
+      guess = @input_handler.get_user_guess(@guessed_letters)
 
-      puts @word
-      show_current_state(@current_state, @remaining_attempts, @guess_array)
-      guess = @input_handler.get_user_guess(@guess_array)
-
-      if @current_state == @word
-        show_win_message(@word)
-        return
-      else
-        provide_feedback(guess)
-      end
+      result = check_guess(guess) # Method from GameLogic
+      handle_guess_result(result, guess)
     end
 
-    show_lose_message(@word)
+    finalize_game
   end
 
   private
 
-  def provide_feedback(guess)
-    if @word.include?(guess)
-      show_correct_guess_message(guess)
-      matching_indices = find_matching_indices(guess)
-      update_current_state(guess, matching_indices)
+  def handle_guess_result(result, guess)
+    case result
+    when :correct
+      show_correct_guess_message(guess) # Method from Display
+    when :incorrect
+      show_incorrect_guess_message(guess) # Method from Display
+    end
+  end
 
+  def finalize_game
+    if won? # Method from GameLogic
+      show_win_message(@word) # Method from Display
     else
-      show_incorrect_guess_message(guess)
-      @remaining_attempts -= 1
-    end
-    @guess_array.push(guess)
-  end
-
-  def find_matching_indices(guess)
-    matching_indices = []
-
-    @word.each_char.with_index do |char, index|
-      matching_indices << index if char == guess
-    end
-
-    matching_indices
-  end
-
-  def update_current_state(guess, matching_indices)
-    matching_indices.each do |index|
-      @current_state[index] = guess
+      show_lose_message(@word) # Method from Display
     end
   end
 end
