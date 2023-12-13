@@ -51,6 +51,27 @@ module Display
   end
 end
 
+class InputHandler
+  # Prompts the user for a guess and returns the validated guess
+  def get_user_guess(guessed_letters)
+    loop do
+      puts "Enter your guess (a single letter): "
+      guess = gets.chomp.downcase
+
+      return guess if valid_guess?(guess, guessed_letters)
+
+      puts "Invalid guess. Please choose a single letter."
+    end
+  end
+
+  private
+
+  # Validates the user's guess
+  def valid_guess?(guess, guessed_letters)
+    guess.length == 1 && guess.match?(/[a-zA-Z]/) && !guessed_letters.include?(guess)
+  end
+end
+
 class Game
   NUMBER_OF_ATTEMPTS = 6
   include Display
@@ -60,6 +81,7 @@ class Game
     @current_state = "_" * @word.length
     @remaining_attempts = NUMBER_OF_ATTEMPTS
     @guess_array = []
+    @input_handler = InputHandler.new
   end
 
   def play
@@ -67,7 +89,7 @@ class Game
 
       puts @word
       show_current_state(@current_state, @remaining_attempts, @guess_array)
-      guess = prompt_guess
+      guess = @input_handler.get_user_guess(@guess_array)
 
       if @current_state == @word
         show_win_message(@word)
@@ -81,21 +103,6 @@ class Game
   end
 
   private
-
-  def prompt_guess
-    loop do
-      puts "Enter your guess: "
-      guess = gets.chomp.downcase
-      return guess if valid_guess?(guess)
-
-      puts "Invalid guess. Please choose another letter."
-    end
-  end
-
-  def valid_guess?(guess)
-    guess.length == 1 && guess.match?(/\A[a-zA-Z]+\z/) &&
-      !@current_state.include?(guess) && !@guess_array.include?(guess)
-  end
 
   def provide_feedback(guess)
     if @word.include?(guess)
