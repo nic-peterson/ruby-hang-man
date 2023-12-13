@@ -62,28 +62,15 @@ class Game
     @guess_array = []
   end
 
-  # def display_all
-  # puts @word
-  # puts @current_state
-  # puts @remaining_attempts
-  # end
-
-  # def display
-  # puts "Remaining attempts: #{@remaining_attempts}"
-  # puts "#{@current_state}"
-  # puts "Guesses: #{@guess_array.join(" ")}"
-  # end
-
   def play
     until (@remaining_attempts == 0)
-      # display
+
       puts @word
       show_current_state(@current_state, @remaining_attempts, @guess_array)
       guess = prompt_guess
 
       if @current_state == @word
         show_win_message(@word)
-        # puts "Congratulations! You've guessed the word!"
         return
       else
         provide_feedback(guess)
@@ -91,7 +78,6 @@ class Game
     end
 
     show_lose_message(@word)
-    # puts "\e[36mGame over! The secret word was: #{@word}\e[36m\e[0m"
   end
 
   private
@@ -114,7 +100,6 @@ class Game
   def provide_feedback(guess)
     if @word.include?(guess)
       show_correct_guess_message(guess)
-      # puts "\e[32m#{guess} is correct!\e[32m\e[0m"
       matching_indices = find_matching_indices(guess)
       update_current_state(guess, matching_indices)
 
