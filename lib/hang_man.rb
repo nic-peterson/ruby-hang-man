@@ -127,15 +127,30 @@ class Game
   end
 
   def play
-    until game_over? # Method from GameLogic
-      show_current_state(@current_state, @remaining_attempts, @guessed_letters) # Method from Display
-      guess = @input_handler.get_user_guess(@guessed_letters)
+    until game_over?
+      show_current_state(@current_state, @remaining_attempts, @guessed_letters)
+      puts "Enter 'save' to save the game, or make your guess:"
+      choice = gets.chomp.downcase
 
-      result = check_guess(guess) # Method from GameLogic
-      handle_guess_result(result, guess)
+      if choice == 'save'
+        save_game
+        puts "Game saved!"
+        return
+      else
+        result = check_guess(choice)
+        handle_guess_result(result, choice)
+      end
     end
 
     finalize_game
+  end
+
+  def save_game
+    File.open('saved_game', 'wb') { |file| Marshal.dump(self, file) }
+  end
+
+  def self.load_game
+    File.open('saved_game', 'rb') { |file| Marshal.load(file) }
   end
 
   private
@@ -158,5 +173,19 @@ class Game
   end
 end
 
-game = Game.new
-game.play
+def start_game
+  puts "Welcome to Hangman!"
+  puts "1. Start New Game"
+  puts "2. Load Saved Game"
+  choice = gets.chomp
+
+  game = if choice == '2' && File.exist?('saved_game')
+           Game.load_game
+         else
+           Game.new
+         end
+
+  game.play
+end
+
+start_game
