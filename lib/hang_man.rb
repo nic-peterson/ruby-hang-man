@@ -42,7 +42,7 @@ module Display
 
   # Displays a winning message when the player guesses the word
   def show_win_message(word)
-    puts "e[32m\eCongratulations! You've guessed the word! #{word}e[32m\e[0m"
+    puts "\e[32mCongratulations! You've guessed the word: #{word}\e[32m\e[0m"
   end
 
   # Displays a losing message when the player runs out of attempts
